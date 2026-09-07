@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes, Navigate } from "react-router-dom";
+import HomeView from "./pages/HomeView";
 import CustomersView from "./pages/CustomersView";
 import TransferView from "./pages/TransferView";
 import TransactionHistoryView from "./pages/TransactionHistoryView";
@@ -6,6 +7,7 @@ import Icon from "./components/Icon";
 import "./App.css";
 
 const NAV = [
+  { to: "/inicio", label: "Inicio", icon: "home" },
   { to: "/clientes", label: "Clientes", icon: "users" },
   { to: "/transferir", label: "Transferir", icon: "transfer" },
   { to: "/historico", label: "Histórico", icon: "history" },
@@ -34,7 +36,8 @@ export default function App() {
 
       <main className="content">
         <Routes>
-          <Route path="/" element={<Navigate to="/clientes" replace />} />
+          <Route path="/" element={<Navigate to="/inicio" replace />} />
+          <Route path="/inicio" element={<HomeView />} />
           <Route path="/clientes" element={<CustomersView />} />
           <Route path="/transferir" element={<TransferView />} />
           <Route path="/historico" element={<TransactionHistoryView />} />

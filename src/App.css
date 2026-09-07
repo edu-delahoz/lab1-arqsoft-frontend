@@ -168,6 +168,8 @@ input:focus {
 .btn.primary:hover { background: var(--accent-ink); }
 .btn.ghost { background: transparent; color: var(--ink-soft); border-color: var(--border-strong); font-weight: 500; }
 .btn.ghost:hover { background: var(--surface-sunken); border-color: var(--muted); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.primary:disabled:hover { background: var(--accent); }
 
 .icon-btn {
   display: grid;
@@ -285,7 +287,221 @@ td.money.neg { color: var(--neg); }
 .receipt dt { margin: 0; color: var(--muted); font-size: 0.85rem; }
 .receipt dd { margin: 0; font-weight: 500; text-align: right; }
 
+/* ---------- Avatar ---------- */
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  flex: none;
+  line-height: 1;
+}
+
+/* ---------- Chips ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.chip:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.chip-mine { color: var(--accent-ink); border-color: var(--accent-soft); background: var(--accent-soft); }
+.chip-mine:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.amount-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.amount-field { margin-top: 4px; }
+
+.field-label-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.field-label-row label { margin: 0; }
+
+/* ---------- icon-btn: estados extra ---------- */
+.icon-btn.ok { color: var(--pos); border-color: var(--pos); background: var(--pos-soft); }
+.icon-btn.star-active { color: #d9a406; border-color: #f0d27a; background: #fdf6e3; }
+.copy-label { font-size: 0.82rem; font-weight: 600; }
+.icon-btn:has(.copy-label) { width: auto; gap: 6px; padding: 0 12px; }
+
+.row-actions { display: inline-flex; gap: 6px; justify-content: flex-end; }
+.name-cell { display: inline-flex; align-items: center; gap: 10px; }
+.account-cell { display: inline-flex; align-items: center; gap: 8px; }
+.tag-mine {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.tag-mine .icon { color: #d9a406; }
+.row-mine { background: var(--accent-soft) !important; }
+
+/* ---------- AccountSelect (combobox) ---------- */
+.account-select { position: relative; }
+.account-select-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.balance-hint { display: block; margin-top: 6px; font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+.balance-hint.neg { color: var(--neg); font-weight: 600; }
+
+.account-options {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(20, 23, 28, 0.12);
+  max-height: 280px;
+  overflow-y: auto;
+}
+.account-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.account-option.active { background: var(--surface-sunken); }
+.account-option-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.account-option-name { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+.account-option-sub { font-size: 0.8rem; color: var(--muted); }
+.account-option-balance { font-size: 0.82rem; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+/* ---------- Transferir: layout con swap ---------- */
+.transfer-fields {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.swap-btn { margin-top: 26px; }
+@media (max-width: 620px) {
+  .transfer-fields { grid-template-columns: 1fr; }
+  .swap-btn { margin: -4px auto; transform: rotate(90deg); }
+}
+
+/* ---------- Balance card (estilo Nequi) ---------- */
+.balance-card {
+  background: linear-gradient(150deg, var(--accent), var(--accent-ink));
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(15, 125, 107, 0.28);
+}
+.balance-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.balance-card-label { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 600; opacity: 0.9; }
+.balance-card-account { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; opacity: 0.95; }
+.balance-card-account .icon-btn {
+  width: 28px; height: 28px;
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.balance-card-account .icon-btn:hover { background: rgba(255, 255, 255, 0.28); color: #fff; }
+.balance-card-account .icon-btn.ok { background: rgba(255, 255, 255, 0.28); color: #fff; border-color: rgba(255,255,255,0.4); }
+.balance-card-name { margin: 16px 0 2px; font-size: 0.92rem; opacity: 0.92; }
+.balance-card-amount { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.balance-card-warn { margin: 10px 0 0; display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; opacity: 0.95; }
+
+.balance-card.empty-account {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px dashed var(--border-strong);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.balance-card.empty-account .balance-card-icon {
+  display: grid; place-items: center;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--accent-soft); color: var(--accent-ink);
+}
+.balance-card.empty-account .balance-card-title { margin: 0; font-weight: 600; }
+.balance-card.empty-account .balance-card-sub { margin: 4px 0 0; color: var(--muted); font-size: 0.88rem; }
+.balance-card.empty-account .btn { margin-left: auto; }
+
+/* ---------- Accesos rápidos (Inicio) ---------- */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.12s, border-color 0.15s, box-shadow 0.15s;
+}
+.quick-action:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 6px 18px rgba(20,23,28,0.08); }
+.quick-action-icon {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 11px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  margin-bottom: 4px;
+}
+.quick-action-label { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.quick-action-desc { font-size: 0.82rem; color: var(--muted); }
+
+/* ---------- Lista de movimientos (Inicio) ---------- */
+.movement-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.movement {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.movement:last-child { border-bottom: none; }
+.movement:hover { background: var(--surface-sunken); }
+.movement-flow { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 999px; flex: none; }
+.movement-flow.out { background: var(--neg-soft); color: var(--neg); }
+.movement-flow.in { background: var(--pos-soft); color: var(--pos); }
+.movement-text { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.movement-title { font-weight: 600; font-size: 0.92rem; color: var(--ink); }
+.movement-sub { font-size: 0.8rem; color: var(--muted); }
+.movement-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.movement-amount { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.92rem; }
+.movement-amount.pos { color: var(--pos); }
+.movement-amount.neg { color: var(--neg); }
+.movement-date { font-size: 0.74rem; color: var(--muted); }
+
+.rot-90 { transform: rotate(90deg); }
+
 @media (max-width: 560px) {
   .topbar { flex-direction: column; height: auto; padding: 14px 18px; gap: 12px; }
   .content { padding: 28px 16px 48px; }
+  .topbar nav { flex-wrap: wrap; justify-content: center; }
 }

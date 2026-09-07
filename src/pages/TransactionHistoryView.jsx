@@ -1,29 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getTransactionsByAccount } from "../api/client";
+import { useCustomers } from "../hooks/useCustomers";
+import { useMyAccount } from "../hooks/useMyAccount";
 import { formatCurrency, formatDate } from "../utils/format";
 import Icon from "../components/Icon";
+import AccountSelect from "../components/AccountSelect";
 
 export default function TransactionHistoryView() {
+  const { customers } = useCustomers();
+  const { myAccount } = useMyAccount();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [accountNumber, setAccountNumber] = useState("");
   const [queried, setQueried] = useState("");
   const [transactions, setTransactions] = useState([]);
   const [searched, setSearched] = useState(false);
   const [message, setMessage] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const runQuery = async (acc) => {
+    const value = String(acc).trim();
+    if (!value) return;
     setMessage(null);
-    const acc = accountNumber.trim();
     try {
-      const { data } = await getTransactionsByAccount(acc);
+      const { data } = await getTransactionsByAccount(value);
       setTransactions(data);
-      setQueried(acc);
+      setQueried(value);
       setSearched(true);
     } catch {
       setMessage({ type: "error", text: "No se pudo consultar el histórico. ¿El backend está corriendo?" });
       setTransactions([]);
       setSearched(true);
     }
+  };
+
+  // Precarga desde Inicio (click en un movimiento).
+  useEffect(() => {
+    const acc = location.state?.account;
+    if (acc) {
+      setAccountNumber(String(acc));
+      runQuery(acc);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    runQuery(accountNumber);
   };
 
   return (
@@ -35,8 +58,26 @@ export default function TransactionHistoryView() {
 
       <form className="card inline-form" onSubmit={handleSubmit}>
         <div className="field grow">
-          <label htmlFor="account">Número de cuenta</label>
-          <input id="account" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="Ej. 1023456789" required />
+          <div className="field-label-row">
+            <label htmlFor="account">Número de cuenta</label>
+            {myAccount && String(accountNumber) !== String(myAccount) && (
+              <button
+                type="button"
+                className="chip chip-mine"
+                onClick={() => setAccountNumber(myAccount)}
+              >
+                <Icon name="star" size={13} /> Usar mi cuenta
+              </button>
+            )}
+          </div>
+          <AccountSelect
+            id="account"
+            value={accountNumber}
+            onChange={setAccountNumber}
+            customers={customers}
+            placeholder="Cuenta o nombre…"
+            required
+          />
         </div>
         <button type="submit" className="btn primary">
           <Icon name="search" size={16} /> Consultar
@@ -73,6 +114,7 @@ export default function TransactionHistoryView() {
                     <th>Destino</th>
                     <th className="num">Monto</th>
                     <th>Fecha</th>
+                    <th className="col-action"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -92,6 +134,24 @@ export default function TransactionHistoryView() {
                           {isOut ? "−" : "+"}{formatCurrency(t.amount)}
                         </td>
                         <td>{formatDate(t.timestamp)}</td>
+                        <td className="col-action">
+                          <button
+                            className="icon-btn"
+                            title="Repetir esta transferencia"
+                            aria-label="Repetir esta transferencia"
+                            onClick={() =>
+                              navigate("/transferir", {
+                                state: {
+                                  sender: t.senderAccountNumber,
+                                  receiver: t.receiverAccountNumber,
+                                  amount: t.amount,
+                                },
+                              })
+                            }
+                          >
+                            <Icon name="repeat" size={16} />
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}

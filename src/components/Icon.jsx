@@ -99,6 +99,58 @@ const PATHS = {
       <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
     </>
   ),
+  home: (
+    <>
+      <path d="M3 9.5 12 3l9 6.5" />
+      <path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10" />
+      <path d="M9 21v-6h6v6" />
+    </>
+  ),
+  copy: (
+    <>
+      <rect x="9" y="9" width="12" height="12" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </>
+  ),
+  star: (
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  ),
+  starFilled: (
+    <polygon
+      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+      fill="currentColor"
+    />
+  ),
+  swap: (
+    <>
+      <polyline points="17 4 21 8 17 12" />
+      <line x1="21" y1="8" x2="3" y2="8" />
+      <polyline points="7 20 3 16 7 12" />
+      <line x1="3" y1="16" x2="21" y2="16" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+      <path d="M4 6v12a2 2 0 0 0 2 2h14v-4" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4z" />
+    </>
+  ),
+  chevronDown: <polyline points="6 9 12 15 18 9" />,
+  x: (
+    <>
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </>
+  ),
+  repeat: (
+    <>
+      <polyline points="17 1 21 5 17 9" />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 18, className = "" }) {

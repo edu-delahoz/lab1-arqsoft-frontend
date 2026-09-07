@@ -61,3 +61,31 @@ export function randomAccountNumber() {
   for (let i = 0; i < 9; i++) s += Math.floor(Math.random() * 10);
   return s;
 }
+
+// Enmascara un número de cuenta dejando visibles los últimos 4 dígitos: "1023456789" -> "···6789".
+export function maskAccount(acc) {
+  const s = String(acc ?? "");
+  if (s.length <= 4) return s;
+  return `···${s.slice(-4)}`;
+}
+
+// Iniciales a partir de nombre y apellido: ("Ana", "Pérez") -> "AP".
+export function initials(firstName, lastName) {
+  const a = String(firstName ?? "").trim();
+  const b = String(lastName ?? "").trim();
+  const first = a ? a[0] : "";
+  const second = b ? b[0] : a.length > 1 ? a[1] : "";
+  return (first + second).toUpperCase() || "?";
+}
+
+// Color de avatar estable derivado de un texto (mismo nombre -> mismo tono).
+const AVATAR_COLORS = [
+  "#0f7d6b", "#2563eb", "#7c3aed", "#db2777",
+  "#ea580c", "#0891b2", "#4d7c0f", "#b45309",
+];
+export function avatarColor(seed) {
+  const s = String(seed ?? "");
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}

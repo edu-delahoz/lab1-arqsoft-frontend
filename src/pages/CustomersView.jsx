@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getCustomers, createCustomer, deleteCustomer } from "../api/client";
+import { useMyAccount } from "../hooks/useMyAccount";
 import { formatCurrency, randomAccountNumber } from "../utils/format";
 import Icon from "../components/Icon";
 import MoneyInput from "../components/MoneyInput";
+import Avatar from "../components/Avatar";
+import CopyButton from "../components/CopyButton";
 
 const emptyForm = { accountNumber: "", firstName: "", lastName: "", balance: "" };
 
@@ -11,6 +15,8 @@ export default function CustomersView() {
   const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const { myAccount, setMyAccount, clearMyAccount } = useMyAccount();
+  const navigate = useNavigate();
 
   const loadCustomers = async () => {
     setLoading(true);
@@ -58,6 +64,11 @@ export default function CustomersView() {
     } catch {
       setMessage({ type: "error", text: "No se pudo eliminar el cliente." });
     }
+  };
+
+  const toggleMine = (accountNumber) => {
+    if (String(myAccount) === String(accountNumber)) clearMyAccount();
+    else setMyAccount(accountNumber);
   };
 
   return (
@@ -146,23 +157,57 @@ export default function CustomersView() {
                 </tr>
               </thead>
               <tbody>
-                {customers.map((c) => (
-                  <tr key={c.id}>
-                    <td className="mono">{c.accountNumber}</td>
-                    <td>{c.firstName} {c.lastName}</td>
-                    <td className="num money">{formatCurrency(c.balance)}</td>
-                    <td className="col-action">
-                      <button
-                        className="icon-btn danger"
-                        title="Eliminar cliente"
-                        aria-label={`Eliminar a ${c.firstName} ${c.lastName}`}
-                        onClick={() => handleDelete(c.id, `${c.firstName} ${c.lastName}`)}
-                      >
-                        <Icon name="trash" size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {customers.map((c) => {
+                  const mine = String(myAccount) === String(c.accountNumber);
+                  const name = `${c.firstName} ${c.lastName}`;
+                  return (
+                    <tr key={c.id} className={mine ? "row-mine" : ""}>
+                      <td className="mono">
+                        <span className="account-cell">
+                          {c.accountNumber}
+                          {mine && <span className="tag-mine"><Icon name="starFilled" size={12} /> Mi cuenta</span>}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="name-cell">
+                          <Avatar firstName={c.firstName} lastName={c.lastName} size={30} />
+                          {name}
+                        </span>
+                      </td>
+                      <td className="num money">{formatCurrency(c.balance)}</td>
+                      <td className="col-action">
+                        <div className="row-actions">
+                          <button
+                            className={`icon-btn${mine ? " star-active" : ""}`}
+                            title={mine ? "Quitar como mi cuenta" : "Marcar como mi cuenta"}
+                            aria-label={mine ? `Quitar ${name} como mi cuenta` : `Marcar ${name} como mi cuenta`}
+                            aria-pressed={mine}
+                            onClick={() => toggleMine(c.accountNumber)}
+                          >
+                            <Icon name={mine ? "starFilled" : "star"} size={16} />
+                          </button>
+                          <CopyButton text={c.accountNumber} title="Copiar número de cuenta" />
+                          <button
+                            className="icon-btn"
+                            title="Transferir desde esta cuenta"
+                            aria-label={`Transferir desde ${name}`}
+                            onClick={() => navigate("/transferir", { state: { sender: c.accountNumber } })}
+                          >
+                            <Icon name="send" size={16} />
+                          </button>
+                          <button
+                            className="icon-btn danger"
+                            title="Eliminar cliente"
+                            aria-label={`Eliminar a ${name}`}
+                            onClick={() => handleDelete(c.id, name)}
+                          >
+                            <Icon name="trash" size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
