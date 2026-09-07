@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  getCustomers,
-  createCustomer,
-  deleteCustomer,
-} from "../api/client";
+import { getCustomers, createCustomer, deleteCustomer } from "../api/client";
+import { formatCurrency, randomAccountNumber } from "../utils/format";
+import Icon from "../components/Icon";
+import MoneyInput from "../components/MoneyInput";
 
-const emptyForm = {
-  accountNumber: "",
-  firstName: "",
-  lastName: "",
-  balance: "",
-};
+const emptyForm = { accountNumber: "", firstName: "", lastName: "", balance: "" };
 
 export default function CustomersView() {
   const [customers, setCustomers] = useState([]);
@@ -23,8 +17,7 @@ export default function CustomersView() {
     try {
       const { data } = await getCustomers();
       setCustomers(data);
-      setMessage(null);
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "No se pudieron cargar los clientes. ¿El backend está corriendo?" });
     } finally {
       setLoading(false);
@@ -35,9 +28,8 @@ export default function CustomersView() {
     loadCustomers();
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const setField = (name, value) => setForm((f) => ({ ...f, [name]: value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,7 +38,7 @@ export default function CustomersView() {
         accountNumber: form.accountNumber,
         firstName: form.firstName,
         lastName: form.lastName,
-        balance: parseFloat(form.balance),
+        balance: parseFloat(form.balance || "0"),
       });
       setForm(emptyForm);
       setMessage({ type: "success", text: "Cliente creado correctamente." });
@@ -57,82 +49,123 @@ export default function CustomersView() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm("¿Eliminar este cliente?")) return;
+  const handleDelete = async (id, name) => {
+    if (!confirm(`¿Eliminar a ${name}?`)) return;
     try {
       await deleteCustomer(id);
       setMessage({ type: "success", text: "Cliente eliminado." });
       loadCustomers();
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "No se pudo eliminar el cliente." });
     }
   };
 
   return (
     <section>
-      <h2>Clientes</h2>
+      <header className="page-head">
+        <h2>Clientes</h2>
+        <p>Registra cuentas y consulta el saldo de cada cliente del banco.</p>
+      </header>
 
       <form className="card" onSubmit={handleSubmit}>
-        <h3>Crear nuevo cliente</h3>
-        <div className="form-grid">
-          <label>
-            Número de cuenta
-            <input name="accountNumber" value={form.accountNumber} onChange={handleChange} required />
-          </label>
-          <label>
-            Nombre
-            <input name="firstName" value={form.firstName} onChange={handleChange} required />
-          </label>
-          <label>
-            Apellido
-            <input name="lastName" value={form.lastName} onChange={handleChange} required />
-          </label>
-          <label>
-            Saldo inicial
-            <input name="balance" type="number" step="0.01" value={form.balance} onChange={handleChange} required />
-          </label>
+        <div className="card-title">
+          <Icon name="plus" size={16} />
+          <h3>Nuevo cliente</h3>
         </div>
-        <button type="submit">Crear cliente</button>
+        <div className="form-grid">
+          <div className="field">
+            <label htmlFor="accountNumber">Número de cuenta</label>
+            <div className="input-with-action">
+              <input id="accountNumber" name="accountNumber" value={form.accountNumber} onChange={handleChange} placeholder="Ej. 1023456789" required />
+              <button
+                type="button"
+                className="icon-btn"
+                title="Generar número de cuenta aleatorio"
+                aria-label="Generar número de cuenta aleatorio"
+                onClick={() => setField("accountNumber", randomAccountNumber())}
+              >
+                <Icon name="shuffle" size={16} />
+              </button>
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="firstName">Nombre</label>
+            <input id="firstName" name="firstName" value={form.firstName} onChange={handleChange} required />
+          </div>
+          <div className="field">
+            <label htmlFor="lastName">Apellido</label>
+            <input id="lastName" name="lastName" value={form.lastName} onChange={handleChange} required />
+          </div>
+          <div className="field">
+            <label htmlFor="balance">Saldo inicial</label>
+            <MoneyInput id="balance" value={form.balance} onChange={(v) => setField("balance", v)} required />
+          </div>
+        </div>
+        <div className="card-actions">
+          <button type="submit" className="btn primary">
+            <Icon name="check" size={16} /> Crear cliente
+          </button>
+        </div>
       </form>
 
-      {message && <p className={`message ${message.type}`}>{message.text}</p>}
+      {message && (
+        <p className={`message ${message.type}`} role="status" aria-live="polite">
+          <Icon name={message.type === "success" ? "check" : "alert"} size={16} />
+          {message.text}
+        </p>
+      )}
 
       <div className="card">
         <div className="card-header">
-          <h3>Listado de clientes</h3>
-          <button className="secondary" onClick={loadCustomers}>Refrescar</button>
+          <div className="card-title">
+            <Icon name="users" size={16} />
+            <h3>Clientes registrados</h3>
+            <span className="badge">{customers.length}</span>
+          </div>
+          <button className="btn ghost" onClick={loadCustomers} aria-label="Refrescar listado">
+            <Icon name="refresh" size={16} /> Refrescar
+          </button>
         </div>
+
         {loading ? (
-          <p>Cargando...</p>
+          <p className="empty">Cargando…</p>
         ) : customers.length === 0 ? (
-          <p>No hay clientes registrados.</p>
+          <div className="empty">
+            <Icon name="inbox" size={28} />
+            <p>Aún no hay clientes. Crea el primero arriba.</p>
+          </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cuenta</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Saldo</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.id}</td>
-                  <td>{c.accountNumber}</td>
-                  <td>{c.firstName}</td>
-                  <td>{c.lastName}</td>
-                  <td>${Number(c.balance).toFixed(2)}</td>
-                  <td>
-                    <button className="danger" onClick={() => handleDelete(c.id)}>Eliminar</button>
-                  </td>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cuenta</th>
+                  <th>Nombre</th>
+                  <th className="num">Saldo</th>
+                  <th className="col-action"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {customers.map((c) => (
+                  <tr key={c.id}>
+                    <td className="mono">{c.accountNumber}</td>
+                    <td>{c.firstName} {c.lastName}</td>
+                    <td className="num money">{formatCurrency(c.balance)}</td>
+                    <td className="col-action">
+                      <button
+                        className="icon-btn danger"
+                        title="Eliminar cliente"
+                        aria-label={`Eliminar a ${c.firstName} ${c.lastName}`}
+                        onClick={() => handleDelete(c.id, `${c.firstName} ${c.lastName}`)}
+                      >
+                        <Icon name="trash" size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </section>
